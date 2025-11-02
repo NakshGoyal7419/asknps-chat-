@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AskNPS – AI Chat Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9fafb;
+      color: #333;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    h1 { text-align: center; }
+    .chat-box {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      height: 400px;
+      overflow-y: auto;
+      background: #fff;
+    }
+    .user, .bot {
+      margin: 8px 0;
+      padding: 8px 12px;
+      border-radius: 8px;
+    }
+    .user { background: #0078ff; color: #fff; text-align: right; }
+    .bot { background: #eee; color: #000; text-align: left; }
+    #input-area { margin-top: 10px; display: flex; }
+    input { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
+    button { margin-left: 8px; padding: 10px 16px; border: none; background: #0078ff; color: white; border-radius: 8px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>AskNPS 🤖</h1>
+  <div class="chat-box" id="chat"></div>
+  <div id="input-area">
+    <input id="msg" placeholder="Type a message...">
+    <button onclick="send()">Send</button>
+  </div>
+
+  <script>
+    async function send() {
+      const input = document.getElementById('msg');
+      const chat = document.getElementById('chat');
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      chat.innerHTML += `<div class="user">${userText}</div>`;
+      input.value = '';
+
+      const res = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userText })
+      });
+      const data = await res.json();
+      chat.innerHTML += `<div class="bot">${data.reply}</div>`;
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
